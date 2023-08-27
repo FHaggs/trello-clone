@@ -1,0 +1,67 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id String @id @default(cuid())
+  name String
+  email String @unique
+
+  cards Card[]
+}
+
+model Project {
+  id String @id @default(cuid())
+  name String
+  description String?
+
+  documents Document[]
+}
+
+model Document {
+  id String @id @default(cuid())
+  name String
+  projectId String
+
+
+  cards Card[]
+
+
+  project Project @relation(fields: [projectId], references: [id])
+
+}
+
+model Card {
+  id String @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  name String
+  description String?
+
+  isDone Boolean @default(false)
+  version Int @default(0)
+  documentId String
+  creatorUserId String
+  cardListId String?
+
+  createdBy User @relation(fields: [creatorUserId], references: [id])
+  document Document @relation(fields: [documentId], references: [id])
+  cardList CardList? @relation(fields: [cardListId], references: [id])
+}
+
+
+model CardList {
+  id String @id @default(cuid())
+  name String
+
+  
+  cards Card[]
+}
